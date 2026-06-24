@@ -191,6 +191,73 @@
   }
   .emoji-row{ font-size:28px; margin-bottom:10px; }
 
+  /* envelope intro */
+  #envelopePage{ cursor:pointer; }
+  .envelope-wrap{
+    position:relative;
+    width: 220px;
+    height: 150px;
+    margin: 0 auto 28px;
+  }
+  .envelope-back{
+    position:absolute;
+    inset:0;
+    background: var(--rose);
+    border-radius: 10px;
+    box-shadow: 0 14px 30px rgba(255,127,168,.45);
+  }
+  .envelope-letter{
+    position:absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 8px;
+    height: 110px;
+    background: #fffdf8;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,.12);
+    transition: transform .6s cubic-bezier(.2,.8,.2,1);
+    z-index: 2;
+  }
+  .envelope-letter::before{
+    content: "💌";
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 30px;
+  }
+  .envelope-flap{
+    position:absolute;
+    top:0; left:0; right:0;
+    height: 0;
+    border-left: 110px solid transparent;
+    border-right: 110px solid transparent;
+    border-top: 75px solid var(--deep);
+    transform-origin: top;
+    transition: transform .55s cubic-bezier(.3,.8,.3,1.1);
+    z-index: 3;
+  }
+  #envelopePage.opened .envelope-flap{
+    transform: rotateX(180deg);
+  }
+  #envelopePage.opened .envelope-letter{
+    transform: translateY(-46px) scale(1.06);
+  }
+  .envelope-pulse{
+    animation: envPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes envPulse{
+    0%,100%{ transform: scale(1) rotate(0deg); }
+    50%{ transform: scale(1.04) rotate(-1deg); }
+  }
+  .tap-hint{
+    color: var(--ink);
+    opacity:.65;
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
   /* receipt result */
   .receipt-overlay{
     position:fixed;
@@ -340,8 +407,20 @@
     <span style="top:50%; left:5%; animation-delay:1.6s;">🎟️</span>
   </div>
 
+  <!-- Page 0: Envelope intro -->
+  <div class="screen" id="envelopePage" onclick="openEnvelope()">
+    <div class="envelope-wrap envelope-pulse">
+      <div class="envelope-back"></div>
+      <div class="envelope-letter"></div>
+      <div class="envelope-flap"></div>
+    </div>
+    <h1>คุณได้รับจดหมายลึกลับ! 💌</h1>
+    <p class="sub">กดที่จดหมายเพื่อเปิดอ่านนะ...</p>
+    <p class="tap-hint">👆 แตะเพื่อเปิด</p>
+  </div>
+
   <!-- Page 1 -->
-  <div class="screen" id="askPage">
+  <div class="screen hidden" id="askPage">
     <div class="emoji-row">🎬🍿</div>
     <h1>ไปดูหนังกันมั้ยคับ? 🥺</h1>
     <p class="sub">ดูหนังน่ารักๆ หนังผีฟิรๆ(กัวๆๆๆ)😱 ไปกินข้าวอร่อยๆกันน้าา🍛 🥹💕</p>
@@ -445,6 +524,18 @@
       dodge();
     });
   });
+
+  function openEnvelope(){
+    const env = document.getElementById('envelopePage');
+    if(env.classList.contains('opened')) return;
+    env.classList.add('opened');
+    env.style.cursor = 'default';
+
+    setTimeout(() => {
+      env.classList.add('hidden');
+      document.getElementById('askPage').classList.remove('hidden');
+    }, 650);
+  }
 
   function sayYes(){
     document.getElementById('askPage').classList.add('hidden');
